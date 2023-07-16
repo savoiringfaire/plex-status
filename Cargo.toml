@@ -1,0 +1,82 @@
+[package]
+name = "plex-status"
+version = "0.1.0"
+edition = "2021"
+
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+leptos = { version = "0.4", features = ["nightly"] }
+leptos_axum = { version = "0.4",  optional = true }
+leptos_meta = {  version = "0.4", features = ["nightly"] }
+leptos_router = {  version = "0.4", features = ["nightly"] }
+wasm-bindgen = "0.2"
+cfg-if = "1.0.0"
+tracing = "0.1"
+tokio = { version = "1.22.0", features = ["full"], optional = true }
+http = { version = "0.2.8", optional = true }
+axum = { version = "0.6.1", optional = true }
+tower = { version = "0.4.13", optional = true }
+tower-http = { version = "0.4", features = ["fs"], optional = true }
+gloo-timers = { version = "0.2.6", features = ["futures"] }
+serde = { version = "1.0.171", features = ["derive", "unstable"] }
+reqwest = { version = "0.11.18", features = ["json"] }
+serde-aux = "4.2.0"
+leptos_server_signal = { version = "0.4.0" }
+uuid = { version = "1.4.0", features = ["v4"], optional = true }
+futures-util = { version = "0.3.28", features = ["futures-channel"] }
+tokio-stream = "0.1.14"
+
+[patch.crates-io]
+leptos_server_signal = { git = "https://github.com/savoiringfaire/leptos_server_signal.git" }
+
+[features]
+default = ["csr"]
+csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
+hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
+ssr = [
+  "dep:axum",
+  "dep:tower",
+  "dep:tower-http",
+  "dep:tokio",
+  "dep:http",
+  "dep:uuid",
+  "leptos/ssr",
+  "leptos_server_signal/ssr",
+  "leptos_server_signal/axum",
+  "leptos_axum",
+  "leptos_meta/ssr",
+  "leptos_router/ssr",
+]
+
+[package.metadata.cargo-all-features]
+denylist = ["axum", "tower", "tower-http", "tokio", "http", "leptos_axum"]
+skip_feature_sets = [["csr", "ssr"], ["csr", "hydrate"], ["ssr", "hydrate"]]
+
+[package.metadata.leptos]
+env = "DEV"
+# The name used by wasm-bindgen/cargo-leptos for the JS/WASM bundle. Defaults to the crate name
+output-name = "plex_status"
+# The site root folder is where cargo-leptos generate all output. WARNING: all content of this folder will be erased on a rebuild. Use it in your server setup.
+site-root = "target/site"
+# The site-root relative folder where all compiled output (JS, WASM and CSS) is written
+# Defaults to pkg
+site-pkg-dir = "pkg"
+
+style-file = "style/output.css"
+
+site-addr = "127.0.0.1:3000"
+# The port to use for automatic reload monitoring
+reload-port = 3001
+
+bin-default-features = false
+
+bin-features = ["ssr"]
+
+# The features to use when compiling the lib target
+#
+# Optional. Can be over-ridden with the command line parameter --lib-features
+lib-features = ["hydrate"]
