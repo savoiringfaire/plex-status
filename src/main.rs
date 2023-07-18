@@ -72,6 +72,25 @@ cfg_if! {
         handler(req).await.into_response()
     }
 
+    async fn update_data(tx: &mut watch::Sender<Count>, tautulli_url: &String) -> Result<(), ServerFnError> {
+        let resp = reqwest::get(tautulli_url)
+            .await?
+            .json::<TautulliResponse<TautulliDataResponse<TautulliActivityData>>>()
+            .await
+            .map_err(|e| ServerFnError::from(e))
+            .map(|r| r.response)?;
+
+
+        let mut stats = Count {
+            total_bandwidth: resp.data.wan_bandwidth,
+            stream_count: resp.data.stream_count,
+        };
+
+        tx.send(stats);
+
+        Ok(())
+    }
+
     #[tokio::main]
     async fn main() {
         let conf = get_configuration(Some("Cargo.toml")).await.unwrap();
@@ -79,7 +98,7 @@ cfg_if! {
         let addr = leptos_options.site_addr;
         let routes = generate_route_list(|cx| view! { cx, <App/> }).await;
 
-        let (tx, mut rx) = watch::channel(Count{ total_bandwidth: 0, stream_count: 10 });
+        let (mut tx, mut rx) = watch::channel(Count{ total_bandwidth: 0, stream_count: 10 });
         let app_state = AppState { tx: rx, leptos_options: leptos_options.clone() };
 
         // build our application with a route
@@ -96,23 +115,7 @@ cfg_if! {
 
         let broadcaster = tokio::spawn(async move {
             loop {
-                let resp = reqwest::get(&tautulli_url)
-                    .await
-                    .unwrap()
-                    .json::<TautulliResponse<TautulliDataResponse<TautulliActivityData>>>()
-                    .await
-                    .map_err(|e| ServerFnError::from(e))
-                    .map(|r| r.response)
-                    .unwrap();
-
-
-                let mut stats = Count {
-                    total_bandwidth: resp.data.wan_bandwidth,
-                    stream_count: resp.data.stream_count,
-                };
-
-                tx.send(stats);
-
+                update_data(&mut tx, &tautulli_url).await;
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             }
         });
