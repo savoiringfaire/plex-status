@@ -38,7 +38,7 @@ cfg_if! {
 
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
-    leptos_server_signal::provide_websocket(cx, "ws://localhost:3000/ws").unwrap();
+    leptos_server_signal::provide_websocket(cx, "wss://plex.hhra.uk/ws").unwrap();
 
     view! {
         cx,
