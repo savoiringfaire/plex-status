@@ -20,7 +20,7 @@ tokio = { version = "1.22.0", features = ["full"], optional = true }
 http = { version = "0.2.8", optional = true }
 axum = { version = "0.6.1", optional = true }
 tower = { version = "0.4.13", optional = true }
-tower-http = { version = "0.4", features = ["fs"], optional = true }
+tower-http = { version = "0.4.2", features = ["trace", "fs"], optional = true }
 gloo-timers = { version = "0.2.6", features = ["futures"] }
 serde = { version = "1.0.171", features = ["derive", "unstable"] }
 reqwest = { version = "0.11.18", features = ["json"] }
@@ -29,6 +29,7 @@ leptos_server_signal = { version = "0.4.0" }
 uuid = { version = "1.4.0", features = ["v4"], optional = true }
 futures-util = { version = "0.3.28", features = ["futures-channel"] }
 tokio-stream = "0.1.14"
+tracing-subscriber = "0.3.17"
 
 [patch.crates-io]
 leptos_server_signal = { git = "https://github.com/savoiringfaire/leptos_server_signal.git" }
@@ -37,20 +38,7 @@ leptos_server_signal = { git = "https://github.com/savoiringfaire/leptos_server_
 default = ["csr"]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
-ssr = [
-  "dep:axum",
-  "dep:tower",
-  "dep:tower-http",
-  "dep:tokio",
-  "dep:http",
-  "dep:uuid",
-  "leptos/ssr",
-  "leptos_server_signal/ssr",
-  "leptos_server_signal/axum",
-  "leptos_axum",
-  "leptos_meta/ssr",
-  "leptos_router/ssr",
-]
+ssr = ["dep:axum", "dep:tower", "dep:tower-http", "dep:tokio", "dep:http", "dep:uuid", "leptos/ssr", "leptos_server_signal/ssr", "leptos_server_signal/axum", "leptos_axum", "leptos_meta/ssr", "leptos_router/ssr"]
 
 [package.metadata.cargo-all-features]
 denylist = ["axum", "tower", "tower-http", "tokio", "http", "leptos_axum"]

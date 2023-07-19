@@ -26,6 +26,9 @@ cfg_if! {
     use leptos_server_signal::ServerSignal;
     use serde::{Deserialize, Serialize};
     use serde_aux::prelude::*;
+    use tracing_subscriber;
+    use tower_http::trace::TraceLayer;
+
 
     #[derive(Serialize, Deserialize, Clone)]
     pub struct TautulliResponse<T> {
@@ -93,6 +96,8 @@ cfg_if! {
 
     #[tokio::main]
     async fn main() {
+        tracing_subscriber::fmt::init();
+
         let conf = get_configuration(Some("Cargo.toml")).await.unwrap();
         let leptos_options = conf.leptos_options;
         let addr = leptos_options.site_addr;
@@ -107,6 +112,7 @@ cfg_if! {
         .route("/api/*fn_name", get(server_fn_handler).post(server_fn_handler))
         .leptos_routes_with_handler(routes, get(leptos_routes_handler) )
         .fallback(file_and_error_handler)
+        .layer(TraceLayer::new_for_http())
         .with_state(app_state);
 
         let tautulli_domain = std::env::var("TAUTULLI_DOMAIN").expect("TAUTULLI_DOMAIN must be set");
