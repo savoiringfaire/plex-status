@@ -1,5 +1,5 @@
 use leptos::{Scope, IntoView, view, component, Children};
-use leptos_heroicons::size_24::solid::CheckCircle;
+
 
 #[component]
 pub fn StatusBox(

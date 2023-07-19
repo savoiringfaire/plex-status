@@ -1,5 +1,5 @@
 use cfg_if::cfg_if;
-use leptos::{component, view, IntoView, Scope, Suspense, LeptosOptions, AdditionalAttributes};
+use leptos::{component, view, IntoView, Scope, AdditionalAttributes};
 use leptos_meta::{Stylesheet, Body};
 
 pub mod components;
