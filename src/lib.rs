@@ -27,6 +27,7 @@ cfg_if! {
         };
         use tokio::sync::watch;
         use axum::extract::FromRef;
+        use leptos::LeptosOptions;
 
         #[derive(Clone, FromRef)]
         pub struct AppState {
