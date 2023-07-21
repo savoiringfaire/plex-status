@@ -1,12 +1,13 @@
 use cfg_if::cfg_if;
-use leptos::{component, view, IntoView, Scope, AdditionalAttributes};
-use leptos_meta::{Stylesheet, Body};
+use leptos::{component, view, IntoView, Scope, AdditionalAttributes, create_signal};
+use leptos_meta::{Stylesheet, Body, provide_meta_context};
 
 pub mod components;
 pub mod error_template;
 pub mod fallback;
 
 use components::current_viewers::CurrentViewers;
+use components::link::Link;
 
 use serde::{Deserialize, Serialize};
 
@@ -39,14 +40,26 @@ cfg_if! {
 
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
-    leptos_server_signal::provide_websocket(cx, "wss://plex.hhra.uk/ws").unwrap();
+    leptos_server_signal::provide_websocket(cx, "ws://localhost:3000/ws").unwrap();
+    provide_meta_context(cx);
+
+    let (name, _) = create_signal(cx, "Make a Request".to_string());
+    let name: String = "test".into();
 
     view! {
         cx,
         <>
             <Body attributes=AdditionalAttributes::from([("class", "bg-stone-700")])/>
             <Stylesheet id="leptos" href="/pkg/plex_status.css"/>
-            <CurrentViewers />
+            <div class="grid h-screen place-items-center">
+                <div class="flex flex-col items-center text-center gap-5">
+                    <CurrentViewers />
+                    <div class="flex gap-5">
+                        <Link title="Make a Request".into() link="https://requests.hhra.uk".into() />
+                        <Link title="Head To Plex".into() link="https://plex.tv/web".into() />
+                    </div>
+                </div>
+            </div>
         </>
     }
 }
